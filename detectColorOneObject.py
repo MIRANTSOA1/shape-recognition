@@ -47,12 +47,52 @@ def get_closest_color_name_hsv(requested_rgb):
 
     return closest_color_name
 
+# def detect_objects_and_colors(frame):
+    """Détecter les objets et leurs couleurs dans une image capturée."""
+    # Convertir l'image en espace de couleur HSV
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # Définir une plage de couleurs pour le masque (ajuster selon le besoin)
+    lower_bound = np.array([0, 50, 50])
+    upper_bound = np.array([180, 255, 255])
+
+    # Créer un masque avec les plages de couleurs
+    mask = cv2.inRange(hsv_frame, lower_bound, upper_bound)
+
+    # Trouver les contours des objets détectés par le masque
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if area > 500:  # Ajuster la taille minimale de l'objet
+            # Dessiner les contours
+            cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
+
+            # Calculer le centre du contour pour annoter la couleur
+            M = cv2.moments(contour)
+            if M["m00"] != 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+
+                # Extraire la couleur de l'objet détecté au centre du contour
+                color_rgb = rgb_frame[cY, cX]
+                color_name = get_closest_color_name_hsv(tuple(color_rgb))
+
+                # Afficher le nom de la couleur au centre du contour
+                cv2.putText(frame, color_name, (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    
+    return frame
+
 def main():
 
     cap = cv2.VideoCapture(0)
     # Définir la résolution de la capture (largeur, hauteur)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1440)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    cap.set(cv2.CAP_PROP_FPS, 60)  # Définir les FPS
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))  # Définir le codec
+
     if not cap.isOpened():
         print("Cam no ouvert")
         return
