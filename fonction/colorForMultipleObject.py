@@ -40,7 +40,7 @@ def get_closest_color_name_hsv(requested_rgb):
 
 def detect_objects_and_colors(frame):
     """Détecter les objets et leurs couleurs dans une image capturée."""
-    # Convertion de l'image en espace de couleur HSV
+
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -51,13 +51,11 @@ def detect_objects_and_colors(frame):
     # Création d'un masque avec les plages de couleurs
     mask = cv2.inRange(hsv_frame, lower_bound, upper_bound)
 
-    # Trouver les contours des objets détectés par le masque
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     for contour in contours:
         area = cv2.contourArea(contour)
-        if area > 500:  # Ajuster la taille minimale de l'objet
-            # Dessin des contours
+        if area > 500:
             cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
 
             # Calcule du centre du contour pour annoter la couleur
@@ -70,7 +68,6 @@ def detect_objects_and_colors(frame):
                 color_rgb = rgb_frame[cY, cX]
                 color_name = get_closest_color_name_hsv(tuple(color_rgb))
 
-                # Affichage du nom de la couleur au centre du contour
                 cv2.putText(frame, color_name, (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
     
     return frame
