@@ -47,7 +47,7 @@ def get_closest_color_name_hsv(requested_rgb):
 
     return closest_color_name
 
-# def detect_objects_and_colors(frame):
+def detect_objects_and_colors(frame):
     """Détecter les objets et leurs couleurs dans une image capturée."""
     # Convertir l'image en espace de couleur HSV
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
