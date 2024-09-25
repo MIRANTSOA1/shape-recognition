@@ -51,7 +51,8 @@ def detect_shape(contour):
         return "Carré" if 0.95 <= aspect_ratio <= 1.05 else "Rectangle"
     elif len(approx) == 5:
         return "Pentagone"
-      
+    elif len(approx) >= 6 and len(approx) <=7:
+        return "Polygone"
     elif len(approx) == 10 or len(approx) == 12:
         return "Etoile"
     else:
@@ -65,7 +66,7 @@ def main():
     if not cap.isOpened():
         print("Erreur : Impossible d'accéder à la caméra.")
         return
-
+    
     while True:
         # Lire une image de la caméra
         ret, frame = cap.read()
@@ -82,9 +83,6 @@ def main():
 
         # Appliquer le filtre gaussien pour réduire le bruit
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-
-        # Utiliser le filtre Canny pour détecter les bords
-        edged = cv2.Canny(blurred, 50, 150)
 
         # Utiliser un seuillage adaptatif pour obtenir une image binaire
         thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
